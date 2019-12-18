@@ -1,6 +1,6 @@
 Summary
 =======
-
+ For the xpi, please look here: v1.0.16: https://github.com/opto/nostalgy-xpi/releases
 
 !!! This is an experimental version for TB 68. Not all original functions/actions 
 have been converted to TB 68 yet.
