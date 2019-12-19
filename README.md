@@ -1,10 +1,6 @@
 Summary
 =======
- For the xpi, please look here: v1.0.16: https://github.com/opto/nostalgy-xpi/releases
-
-!!! This is an experimental version for TB 68. Not all original functions/actions 
-have been converted to TB 68 yet.
-Basic functions, as m, s, g etc. are working. !!!!
+ For the xpi, please look here: v1.0.16a: https://github.com/opto/nostalgy-xpi/releases
 
 
 Nostalgy is an extension for Mozilla Thunderbird whose purpose is to
@@ -28,18 +24,9 @@ folder view.
 Installation
 ============
 
-This is an experimental version for TB 68.
+Download xpi.
+Goto extra->addons. Click settings/install from file, then choose the xpi.
 
-Install in addon manager: install from file, then select the xpi file.
-
-
-Modified by opto (Klaus Buecher) in https://github.com/opto/nostalgy
+Modified by opto (Klaus Buecher) in https://github.com/opto/nostalgy-xpi
 
 
-These are the old instructions for TB <  version 68:
-
-The easiest way to install Thunderbird is through
-https://addons.mozilla.org/en-US/thunderbird/addon/nostalgy/ .  It
-will automatically update itself when new versions are released.
-
-You can also try the latest development version from http://alain.frisch.fr/info/nostalgy-current.xpi
