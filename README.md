@@ -1,5 +1,7 @@
 Summary
 =======
+ *** Update for TB 78 coming ca. next week ***
+ 
  For the xpi, please look here: v1.0.16a: https://github.com/opto/nostalgy-xpi/releases
 
 
