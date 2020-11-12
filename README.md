@@ -1,6 +1,6 @@
 Summary
 =======
- *** Update for TB 78 coming ca. next week ***
+ *** Update for TB 78 on  addons.thunderbird.net  (Nostalgy++) ***
  
  For the xpi, please look here: v1.0.16a: https://github.com/opto/nostalgy-xpi/releases
 
@@ -29,6 +29,6 @@ Installation
 Download xpi.
 Goto extra->addons. Click settings/install from file, then choose the xpi.
 
-Modified by opto (Klaus Buecher) in https://github.com/opto/nostalgy-xpi
+Original code by Alain Frisch. Modified by opto (Klaus Buecher) for TB 68 and now TB 78 in https://github.com/opto/nostalgy-xpi
 
 
