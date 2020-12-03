@@ -1,7 +1,3 @@
-var { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
-
-
-
 var nostalgy_gList = null;
 
 var nostalgy_wait_key = null;
@@ -196,12 +192,10 @@ function onNostalgyAcceptChanges() {
     prefs.setBoolPref("extensions.nostalgy."+n,	NostalgyEBI(n).checked);
 
   if (nostalgy_wait_key) { nostalgy_wait_key.value = nostalgy_wait_key_old; nostalgy_wait_key = null; }
-  for (var i in nostalgy_keys) {
-    let sKey= nostalgy_keys[i][0];
-    let sValue= NostalgyEBI("key_" + nostalgy_keys[i][0]).value;
+  for (var i in nostalgy_keys)
     prefs.setCharPref(nostalgy_kKeysPrefs+nostalgy_keys[i][0],
     NostalgyEBI("key_" + nostalgy_keys[i][0]).value);
-  }
+
 
   var a = prefs.getChildList(nostalgy_kKeysPrefs, { });
   for (var i in a) {
@@ -401,7 +395,11 @@ function NostalgySelectFolder() {
 
 
 function NostalgyDoRestart() {
-Services.startup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eForceQuit);
+
+//borrowed from restart-application-1.2.1 
+var boot=Components.classes['@mozilla.org/toolkit/app-startup;1'].getService(Components.interfaces.nsIAppStartup); 
+boot.quit(Components.interfaces.nsIAppStartup.eForceQuit|Components.interfaces.nsIAppStartup.eRestart);  let {BrowserUtils} = ChromeUtils.import ("resource://gre/modules/BrowserUtils.jsm", {});
+
 }
 
 

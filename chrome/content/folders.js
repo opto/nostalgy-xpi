@@ -208,7 +208,8 @@ function NostalgyAutocompleteComponent() {
 }
 
 function NostalgyFolderSelectionBox(box) {
-  var cmd = box.getAttribute("nostalgyfolderbox");
+
+   var cmd = box.getAttribute("nostalgyfolderbox");
   if (cmd) {
     box.setAttribute("ontextentered",cmd);
     box.setAttribute("ontextcommand",cmd);

@@ -24,7 +24,11 @@ function onNostalgyLoad() {
 }
 
 
+function onNostalgyUnLoad() {
+                alert("unload");
+// document.removeEventListener("dialogaccept", (event) => { onNostalgyAcceptChanges(); });
 
+}
 
 function onNostalgyAcceptChanges() {
 
@@ -77,4 +81,4 @@ function onNostalgyKeyPressTxt(ev) {
 
 window.addEventListener("load", onNostalgyLoad, false);
 
-
+window.addEventListener("unload", onNostalgyUnLoad, false);

@@ -10,11 +10,11 @@
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	buttons="accept,extra2"
 	ondialogaccept="return onNostalgyAcceptChanges();"
-	ondialogextra2="openDialog('chrome://nostalgy/content/about.xul', 'about_nostalgy', 'resizable');"
-	buttonlabelextra2="Nostalgy usage directions..."
+	ondialogextra2="openDialog('chrome://nostalgy/content/about.xul', 'about_nostalgy++', 'resizable');"
+	buttonlabelextra2="Nostalgy++ usage directions..."
         width="900"
         height="500"
-        title="Nostalgy Preferences">
+        title="Nostalgy++ Preferences">
 
  <script src="misc.js"/>
  <script src="folders.js"/>
@@ -35,7 +35,7 @@
  <label>Rules associate folders to messages by looking for a
 substring of the Sender or Subject (or both) headers. A rule can be
 restricted to match messages under a given server/folder. When a folder
-is selected for a given message, Nostalgy informs you in the status line.
+is selected for a given message, Nostalgy++ informs you in the status line.
 You can then use the Shift-S/Shift-C
 shortcuts to move/copy the message to this folder.</label>   
  <vbox >
@@ -130,7 +130,7 @@ shortcuts to move/copy the message to this folder.</label>
 
  <tabpanel>
  <groupbox flex="1">   
- <label>This has some utility functions in addition to standard nostalgy functions</label>   
+ <label>This has some utility functions in addition to standard nostalgy++ functions</label>   
  <vbox >
  <hbox >
 
