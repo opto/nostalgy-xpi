@@ -3,7 +3,7 @@
 <!--
 /*
 * License:  see License.txt
-* Code until Nostalgy 0.3.0/Nostalgy 1.1.15: MIT/X11
+* Code until Nostalgy 0.3.0/Nostalgy 1.1.15: Zlib
  Code additions for TB 78 or later: Creative Commons (CC BY-ND 4.0):
       Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0) 
 
@@ -80,17 +80,28 @@
                             autocompletesearch="nostalgy-autocomplete"
                             autocompletesearchparam="{}"
                             timeout="300"
-                            maxrows="10"
+                            maxrows="25"
+
                             completedefaultindex="true"
                             forcecomplete="true"
-                            completeselectedindex="true"
+ 
                             minresultsforpopup="2"
                             ignoreblurwhilesearching="true"
+
+
+                            highlightnonmatches="true"
+                            crop="center"
+                            recipienttype="addr_to"
+
+                            size="70"
+
+                                        
+                           completeselectedindex="true"
                             nostalgyfolderbox="NostalgyChooseUnder();"
                      
                           
-                            recipienttype="addr_to"
-                            size="1"     />
+
+   />
 
     </row>
 
@@ -105,7 +116,7 @@
                             autocompletesearch="nostalgy-autocomplete"
                             autocompletesearchparam="{}"
                             timeout="300"
-                            maxrows="10"
+                            maxrows="25"
                             completedefaultindex="true"
                             forcecomplete="true"
                             completeselectedindex="true"
@@ -115,7 +126,7 @@
                      
                           
                             recipienttype="addr_to"
-                            size="1"     />
+                            size="70"     />
 
   </row>
   </rows>

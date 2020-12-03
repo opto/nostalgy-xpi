@@ -1,6 +1,6 @@
 /*
  * License:  see License.txt
- * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: MIT/X11
+ * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: Zlib
  * Code additions for TB 78 or later: Creative Commons (CC BY-ND 4.0):
  *      Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0) 
  
@@ -113,4 +113,5 @@ window.onNostalgyLoad();
 
 function onUnload(isAddOnShutDown) {
     console.log("unload messageWindow-nostalgy");
+//    window.onNostalgyUnload();  //also unregisters factory??
 }

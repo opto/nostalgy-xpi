@@ -1,6 +1,6 @@
 /*
  * License:  see License.txt
- * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: MIT/X11
+ * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: Zlib
  * Code additions for TB 78 or later: Creative Commons (CC BY-ND 4.0):
  *      Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0) 
  
@@ -63,10 +63,11 @@ function onLoad(activatedWhileWindowOpen) {
    <hbox   id="status-bar">
 
         <hbox insertbefore="unreadMessageCount"   class="statusbar">
+    <button id="me-help" label = "N++ Help" />
      <label  id="statusbar-nostalgy-label" class="statusbarpanel"
-            value="&nostalgy.memo;"/>
-     <label  id="statusbar-nostalgy-label-newRule" class="statusbarpanel"
-            value="rule: (n)ew / conv(e)rt"/>
+            value="&nostalgy.memo;"    hidden = "true"/>
+     <label  id="statusbar-nostalgy-label-newRule"       class="statusbarpanel"
+            value="rule: (n)ew / conv(e)rt" hidden = "true"/>
  
             </hbox>
 
@@ -84,7 +85,7 @@ function onLoad(activatedWhileWindowOpen) {
    maxrows="25"
    completedefaultindex="true"
    forcecomplete="true"
-
+   
    minresultsforpopup="2"
    ignoreblurwhilesearching="true"
 
@@ -94,7 +95,7 @@ function onLoad(activatedWhileWindowOpen) {
    highlightnonmatches="true"
    crop="center"
    recipienttype="addr_to"
-   onkeyup="onNostalgyInputKeyPressed(event);"
+   onkeydown="onNostalgyInputKeyPressed(event);"
    size="70"
 
    />

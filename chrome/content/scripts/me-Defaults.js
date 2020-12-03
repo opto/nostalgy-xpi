@@ -10,3 +10,4 @@
 //Compose
 pref("extensions.manage_emails.showCC", false);
 pref("extensions.manage_emails.showBCC", false);
+pref("extensions.nostalgy.FolderBoxChars", 70);

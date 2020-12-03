@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<!DOCTYPE window SYSTEM "chrome://nostalgy/locale/nostalgy.dtd">
+
+<dialog id="thumb-window"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        xmlns:html="http://www.w3.org/1999/xhtml"
+        windowtype="extension:nostalgy"
+        title="Image Preview"
+        buttons="accept,cancel"
+        width="400px"
+        height="400px"
+        persist="  screenX screenY "
+        onload="StartThumb(window )"
+        onclose="window.close();"
+
+        >
+  <script type="application/x-javascript" src="chrome://global/content/globalOverlay.js" />
+  <script type="application/x-javascript" src="chrome://nostalgy/content/thumb.js" />
+  
+
+  
+ 
+    <vbox id="scrollbox" flex="1" pack="center" align="center">
+      <hbox pack = "center" flex="1" > 
+       <hbox style =  "max-height: 50ch; max-width: 50ch;" flex="1" >
+        <image id="preview1a" style = "max-height: 50ch; max-width: 50ch;" flex="1"  src="" />
+       </hbox>
+
+      </hbox>
+    </vbox>
+    <hbox pack = "center" flex="1"  align="center"> 
+    <label id="fname"  value = "label" pack="center" />
+</hbox>
+</dialog>

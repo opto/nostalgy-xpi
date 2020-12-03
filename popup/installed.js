@@ -11,7 +11,7 @@
 addEventListener("click", async (event) => {
 	if (event.target.id.startsWith("donate")) {
 
-	  messenger.Utilities.openLinkExternally("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2AKE2G2B9J3ZS");
+	  messenger.Utilities.openLinkExternally("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6K57TUFSNMVSJ&source=url");
 	}
 });  
 

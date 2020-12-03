@@ -1,4 +1,9 @@
-Nostalgy++ 2.2
+Nostalgy++ 2.2.3
+  - allow enter instead TAB enter to select folder (thanks to picheung)
+  - New functions: set width of folderbox in prefs
+                   save/copy/go text moved into tooltip
+
+Nostalgy++ 2.2.0
   - Update code for TB 78
   - New functions: (n)ew rule from main window
                    (e) convert last move operation to rule

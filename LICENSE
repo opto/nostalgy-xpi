@@ -1,5 +1,6 @@
-Copyright (c) 2008 - 2020 Alain Frisch
 Copyright (c) 2019 - 2020 Klaus Buecher
+Copyright (c) 2008 - 2020 Alain Frisch
+
 
 1) This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -21,18 +22,21 @@ freely, subject to the following restrictions:
     distribution.
     
 3) All code added after version Nostalgy++ 1.0.15/Nostalgy 0.3.0 is distributed under the
-  CC BY-ND 4.0 license. The license notice for Nostalgy 0.3.0/Nostalgy++ 1.0.15 must be reproduced.
+   CC BY-ND 4.0 license. The license notice for Nostalgy 0.3.0/Nostalgy++ 1.0.15 must be reproduced. 
+   Some subcomponents are licensed MPL 2.0 and are marked as such.
   
-  CC BY-ND 4.0
 
-LICENSE
+
+LICENSE   CC BY-ND 4.0
 
 
 Manage Emails/Nostalgy++ is released under the Creative Commons (CC BY-ND 4.0)
 Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0) 
 
 Terms: 
-The Program - the Manage Emails/Nostalgy++ Add-on (distributed as a XPI file) and all files contained within it
+The Program - refering to the Manage Emails/Nostalgy++ Add-on (distributed as a XPI file) and to all files contained within it,
+that have been changed after Nostalgy (++) 0.3.0/1.0.15. Unchanged files/code are Zlib license as given above.
+Windowlistener component and TB core snippets are MPL 2.0.
 
 
 

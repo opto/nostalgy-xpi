@@ -1,6 +1,6 @@
 /*
  * License:  see License.txt
- * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: MIT/X11
+ * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: Zlib
  * Code additions for TB 78 or later: Creative Commons (CC BY-ND 4.0):
  *      Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0) 
  
@@ -15,6 +15,7 @@ var nostalgy_old_awRecipientKeyPress = 0;
 var prefs = PrefBranch();
 
 var ccShown=0, bccShown=0;
+var showCC = false, showBCC = false;
 
 function nostalgy_awRecipientKeyPress(event, element) {
 /**/
@@ -165,13 +166,13 @@ var done=0, ccdone=0, bccdone=0, prefsdone=0;
   //    console.log(mutation );console.log("Success");
         //$('#log').text('input text changed: "' + target.text() + '"');
         //console.log(mutation, mutation.type);
-    });
+ //   });
    if (!prefsdone)
    {
       try 
 {
-    var showCC = prefs.getBoolPref("extensions.manage_emails.showCC");
-    var showBCC = prefs.getBoolPref("extensions.manage_emails.showBCC");  
+    showCC = prefs.getBoolPref("extensions.manage_emails.showCC");
+    showBCC = prefs.getBoolPref("extensions.manage_emails.showBCC");  
  
     if (showCC) {
       var label_cc=window.document.getElementById("addr_cc");
@@ -184,6 +185,12 @@ var done=0, ccdone=0, bccdone=0, prefsdone=0;
       var label_bcc=window.document.getElementById("addr_bcc");
       window.showAddressRow(label_bcc, 'addressRowBcc');
       bccShown = 1;
+    }
+    else {
+//      var label_bcc=window.document.getElementById("addressRowBcc");
+//      label_bcc.firstChild.firstChild.click();//window.showAddressRow(label_bcc, 'addressRowBcc');
+      bccShown = 0;
+
     }
  //back to to:
     let input = window.document.getElementById("toAddrInput");
@@ -224,14 +231,15 @@ catch(e) {console.log("headers-box not changed");};
  /*   */
 }
 });
+});
 observer.observe(target, { attributes: true, attributeFilter: ["style"], childList: true, characterData: true, subtree: true });
 //console.log("searchDialog-observer");
 
 function onNostalgyLoadComp(){
   //nostalgy_old_awRecipientKeyPress = window.awRecipientKeyPress;
   //window.awRecipientKeyPress = nostalgy_awRecipientKeyPress;
-  var showCC = prefs.getBoolPref("extensions.manage_emails.showCC");
-  var showBCC = prefs.getBoolPref("extensions.manage_emails.showBCC");  
+  showCC = prefs.getBoolPref("extensions.manage_emails.showCC");
+  showBCC = prefs.getBoolPref("extensions.manage_emails.showBCC");  
   window.addEventListener("keydown", NostalgyKeyPress, false);
 
   const toInput = NostalgyEBI("toAddrInput");;
@@ -242,6 +250,11 @@ function onNostalgyLoadComp(){
   //toInput.addEventListener('keydown', toInputUpdateValue);
   
  
+}
+
+function onNostalgyUnloadComp(){
+  window.removeEventListener("keydown", NostalgyKeyPress);
+  observer.disconnect();
 }
 
 //window.addEventListener("load", onNostalgyLoadComp, false);

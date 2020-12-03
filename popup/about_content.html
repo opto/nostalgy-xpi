@@ -1,7 +1,7 @@
 <!--
   /*
  * License:  see License.txt
- * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: MIT/X11
+ * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: Zlib
  * Code addtions for TB 78 or later: Creative Commons (CC BY-ND 4.0):
  *      Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0) 
  
@@ -29,21 +29,25 @@
           text-decoration: underline;
         }
       </style>
-  </head>
+ 	<link rel="stylesheet" href="popup.css" type="text/css">
+   <script type="application/javascript" src="update.js"></script>
+ </head>
   <body>
 
    <h2>Usage directions for Nostalgy++</h2>
 
    <p>
     Manage Emails/Nostalgy++ is an update of Nostalgy by Alain Frisch to TB 68 and now TB 78,
-     combined with some new functionality.
+     combined with new functionality.
 
    </p>
    <p></p>
    
    <p>
     Nostalgy++ adds several keyboard shortcuts to improve your
-     productivity with Thunderbird. A custom preference dialog for
+     productivity with Thunderbird. <br><br>Since version 2.2.4, it also offers an image viewer, 
+     which allows to view message attachments without starting the external image app or FF.
+     <br><br>A custom preference dialog for
      Nostalgy++ is available through the Tools menu.
    </p>
    <p>
@@ -168,6 +172,8 @@
     <tr><td>l</td><td>Hide/show the folder pane</td></tr>
     <tr><td>ESC-f</td><td>Focus the folder pane</td></tr>   
     <tr><td>ESC-m</td><td>Focus the message pane</td></tr>
+    <tr><td>ESC-r</td><td>Open the attachment list in the message pane</td></tr>   
+    <tr><td>ESC-1</td><td>Display the first image attachment (ESC-2 the second, etc)</td></tr>   
     <tr><td>ESC-ESC</td><td>Focus the thread pane</td></tr>
     <tr><td>ESC-ESC-ESC</td><td>Focus the thread pane, clear quick search box, select the "All" view.  (currently not working in TB78 - may be updated)</td></tr>
     <tr><td>Ctrl-Left/Right</td><td>Scroll the message from the thread pane</td></tr>
@@ -343,7 +349,25 @@ the input box starts with a colon character, or if no folder matches.
       <p>
         Please report errors or bugs on <a id="github" > github: </a> (https://github.com/opto/nostalgy-xpi/issues)
       </p>
-
+      <h3>Help with a Donation!</h3>
+    
+      <p>This Add-on is not written
+        by a large corporation, nor is it sponsored in any way by Mozilla.
+        </p>
+        
+   
+      <p>
+        In TB 78, Thunderbird internals changed widely. Klaus Buecher/opto has been working to make {addon} fully 
+        functional again for Thunderbird 78. At lot of personal time has been put into this. I appreciate if you can support
+      this work by a donation. </p>
+    <p> </p>
+        <p> </p>      
+      <div>    </div>
+         <p class="actionlinks">
+        <a id="donate">I want to contribute with a one time donation</a>
+      </p>
+      <p> </p>
+  
    <hr/>
 
   </body>

@@ -1,6 +1,6 @@
  /*
  * License:  see License.txt
- * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: MIT/X11
+ * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: Zlib
  * Code addtions for TB 78 or later: Creative Commons (CC BY-ND 4.0):
  *      Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0) 
  
@@ -31,6 +31,7 @@ var { manage_emails } = ChromeUtils.import("chrome://nostalgy/content/manage_ema
   }
 
 
+
 };
 */
 var Nostalgy = {
@@ -39,17 +40,20 @@ var Nostalgy = {
 
 var nostalgy_in_message_window = !window.SetFocusThreadPane;
 
-var nostalgy_folderBox = null;
-var nostalgy_statusBar = null;
-var nostalgy_label = null;
-var nostalgy_th_statusBar = null;
+var nostalgy_folderBox = null;     //c html:input for folders
+var nostalgy_help_button = null;   //c help button in statusbar 
+var nostalgy_statusBar = null;     //c box for folder input
+var nostalgy_label = null;         //c label for commands list
+var nostalgy_th_statusBar = null;  //c main Thunderbird statusbar, containing Nostalgy statusbar
 var nostalgy_th_statusBar_orig_hidden = false;  //!!
-var nostalgy_cmdLabel = null;
+var nostalgy_cmdLabel = null;      //c label before folder html:input
 var nostalgy_active_keys = { };
 var nostalgy_timeout_regkey = 0;
 var nostalgy_on_move_completed = null;
 var nostalgy_selection_saved = null;
+var nostalgy_statusbar_nostalgy_label_newRule = null;  //new Rule label
 var DELAY_AFTER_CREATING_FOLDER = 200;
+
 function NostalgyIsDefined(s) {
     return (typeof(window[s]) != "undefined");
 }
@@ -108,7 +112,7 @@ var NostalgyRules =
       var k = "";
       let sKey= nostalgy_keys[i][0];
       try {
-	k = this._branch.getCharPref("keys." + sKey);
+    	k = this._branch.getCharPref("keys." + sKey);
       } catch (ex) { k = nostalgy_keys[i][2]; }
       if (sKey=="save") sSave=k;
       if (sKey=="go") sGo=k;
@@ -179,7 +183,12 @@ var NostalgyRules =
         nostalgy_recent_folders_max_size = this._branch.getIntPref("number_of_recent_folders");
         return;
     }
-    if (nostalgy_completion_options[aData] != undefined) {
+    if (aData == "FolderBoxChars") {
+      nostalgy_folderBoxChars = this._branch.getIntPref("FolderBoxChars");
+      nostalgy_folderBox.setAttribute("size",nostalgy_folderBoxChars);
+return;
+  }
+  if (nostalgy_completion_options[aData] != undefined) {
      nostalgy_completion_options[aData] = this._branch.getBoolPref(aData);
      if (!nostalgy_in_message_window) NostalgyDefLabel();
      return;
@@ -226,6 +235,7 @@ var nostalgy_command = null;
 var nostalgy_last_folder_server = new Array();
 var nostalgy_last_folder = null;
 var nostalgy_gsuggest_folder = null;
+var nostalgy_folderBoxChars = NostalgyRules._branch.getIntPref("FolderBoxChars",70);
 
 function onNostalgyResize() {
   if (nostalgy_label)
@@ -275,18 +285,27 @@ function onNostalgyLoad() {
  // Don't know why, but the blur event does not seem to be fired properly...
 
  
- 
- 
  NostalgyRules.register_keys();
 
+ nostalgy_help_button = NostalgyEBI("me-help");//c needs to be after register_keys
+ nostalgy_help_button.setAttribute("tooltiptext", nostalgy_default_label + " rule: (n)ew / conv(e)rt");
+ //nostalgy_help_button.addEventListener("click", onNostalgyResize, false);
+ nostalgy_help_button.addEventListener("click", (event) => { const url = manage_emails.WL.messenger.runtime.getURL("popup/about_content.html");
+                                                        manage_emails.WL.messenger.windows.create({ url, type: "popup", height: 700, width: 780, });
+                                                        //openDialog('chrome://nostalgy/content/about.html', 'about_nostalgy', 'resizable=yes'); 
+                                                      });
+
+ 
  nostalgy_folderBox = NostalgyEBI("nostalgy-folderbox");//c html:input for folders
  nostalgy_statusBar = NostalgyEBI("nostalgy-statusbar");//c box for folder input
  nostalgy_label = NostalgyEBI("statusbar-nostalgy-label");//c label for commands list
  nostalgy_th_statusBar = NostalgyEBI("status-bar");//c main Thunderbird statusbar, containing Nostalgy statusbar
  nostalgy_cmdLabel = NostalgyEBI("nostalgy-command-label");//c label before folder html:input
- 
+ nostalgy_statusbar_nostalgy_label_newRule = NostalgyEBI("statusbar-nostalgy-label-newRule");
  NostalgyFolderSelectionBox(nostalgy_folderBox);
  nostalgy_label.label = nostalgy_default_label;
+
+ nostalgy_folderBox.setAttribute("size",nostalgy_folderBoxChars);
 
  if (!nostalgy_in_message_window) {
    NostalgyEBI("threadTree").addEventListener("select", NostalgyDefLabel, false);
@@ -312,7 +331,6 @@ function onNostalgyUnload() {
  var mSession = NostalgyMailSession();
  if (mSession) mSession.RemoveFolderListener(NostalgyFolderListener);
  NostalgyRules.unregister();
- //autocompleteFactory.unregister();
  factory.unregister();
 
  //remove listeners
@@ -345,15 +363,19 @@ function NostalgyHide(restore) {
  NostalgyDefLabel();
 }
 
-function NostalgyDefLabel() {
+//add suggestions to label, if exist
+function NostalgyDefLabel() {  //show only short label for shift
  nostalgy_gsuggest_folder = NostalgySuggest();
  if (nostalgy_gsuggest_folder) {
-   nostalgy_label.value =
-       nostalgy_default_label + " [+Shift: => " + NostalgyFolderName(nostalgy_gsuggest_folder) + "]";
+  nostalgy_statusbar_nostalgy_label_newRule.setAttribute("hidden" , "true");  
+    nostalgy_label.value =
+    //   nostalgy_default_label +
+        " [+Shift: => " + NostalgyFolderName(nostalgy_gsuggest_folder) + "]";
  //  nostalgy_label.hidden="false"; 
    nostalgy_label.setAttribute("hidden" , "false");  
  } else {
-   nostalgy_label.value = nostalgy_default_label;
+  nostalgy_statusbar_nostalgy_label_newRule.setAttribute("hidden" , "true");  
+  nostalgy_label.value = "";//nostalgy_default_label;
    nostalgy_label.setAttribute("hidden" , "false");  
 //   nostalgy_label.hidden="false";
  }
@@ -403,6 +425,7 @@ function NostalgyCmd(lab,cmd,require_file) {
 
 function NostalgyShowRecentFoldersList() {
   nostalgy_label.hidden="true";
+  nostalgy_statusbar_nostalgy_label_newRule.hidden = true;  //hide the new rule ... if folderbox is shown
   var listener = null;
   var box = nostalgy_folderBox;
   if (box.controller) {// Toolkit
@@ -443,7 +466,9 @@ function NostalgyCreateTag(name) {
 
 function NostalgyRunCommand() {
   NostalgyHide(true);
+  //nostalgy_statusbar_nostalgy_label_newRule.setAttribute("hidden" , "false");  
   var s = nostalgy_folderBox.value;
+  if ( s.includes(" >> ") ) { s = s.split(" >> ", 2)[1]; }; //thanks to picheung
   var f = NostalgyResolveFolder(s);
   if (f) {
     NostalgyRecordRecentFolder(f);
@@ -749,19 +774,19 @@ function NostalgyEscape() {
   var i = NostalgyEscapePressed;
   setTimeout(
     function(){ if (NostalgyEscapePressed==i) NostalgyEscapePressed = 0; },
-    300);
+    450);
   if (NostalgyEscapePressed == 3) {
       NostalgyDoSearch("");
       ViewChange(kViewItemAll, "All");  // TODO: localized string
       setTimeout(NostalgyFocusThreadPane,100);
   }
-  if (NostalgyEscapePressed == 2) NostalgyFocusThreadPane();
+  if (NostalgyEscapePressed == 2) SetFocusThreadPane(); //from core
 }
 
 function NostalgyFocusMessagePane() {
   // for some reason, advanceFocusIntoSubtree(getebi("messagepane")) does not work
 
-  SetFocusMessagePane();
+  SetFocusMessagePane(); //from core
   var i = 10;
   while (i > 0 &&
          top.document.commandDispatcher.focusedWindow.name != "messagepane")
@@ -919,6 +944,8 @@ function onNostalgyInputKeyPressed(ev) {
     NostalgyHide();
     NostalgyFocusThreadPane();
     NostalgyStopEvent(ev);
+    //nostalgy_statusbar_nostalgy_label_newRule.setAttribute("hidden" , "false");  //help button
+
    return;
    }    
     return;
@@ -926,7 +953,7 @@ function onNostalgyInputKeyPressed(ev) {
 }
 
 function onNostalgyKeyPress(ev) {
-  if (!nostalgy_statusBar.hidden) return;
+  if (!nostalgy_statusBar.hidden) return;  //c only if folderbox is not displayed
 
   if (NostalgyEscapePressed >= 1) {
     if (!nostalgy_in_message_window && ev.key == "m") { // M
@@ -936,18 +963,31 @@ function onNostalgyKeyPress(ev) {
     if (!nostalgy_in_message_window && ev.key == "f") { // F
       document.getElementById("folderTree").focus();
       NostalgyStopEvent(ev);
-    } 
+    } else
+    if (!nostalgy_in_message_window && ev.key == "r") { // R
+      NostalgyStopEvent(ev);
+      let attToggle =  document.getElementById("attachmentToggle");
+      let toggleState = attToggle.checked;
+      toggleAttachmentList(!toggleState, false);// toggleAttachmentList(expanded, updateFocus)
+     } else
+     if (!nostalgy_in_message_window && isFinite(ev.key) ) { // is number
+      NostalgyStopEvent(ev);
+      var thumbWin = window.openDialog("chrome://nostalgy/content/thumb.xhtml", "_blank","dialog,chrome,titlebar,resizable=yes",ev.key );
+      //document.getElementById("folderTree").focus();
+     }
     return;
   }
+//"dialog,chrome,modal,titlebar,resizable=yes"
+//"chrome,centerscreen,dependent,alwaysRaised"
 
-  var kn = NostalgyRecognizeKey(ev);
+var kn = NostalgyRecognizeKey(ev);
   let focusWhere= ev.originalTarget.localName.toLowerCase();
     if (( focusWhere == "html:input"    ||    focusWhere == "input" //sometimes input, sometimes html:input
                         || focusWhere == "textarea")
  //     && !(ev.code =="Alt") && !(ev.code=="Control")
       )   {
  
-         return;
+         return; //c in folderbox, send char there
        }
   var k = nostalgy_active_keys[kn];
   if (k && NostalgyParseCommand(k)) NostalgyStopEvent(ev);
@@ -962,7 +1002,8 @@ function NostalgyParseCommand(k) {
   if (!folder) { alert("Cannot find folder " + spl[2]); return; }
   switch (spl[1]) {
   case "Go": return NostalgyShowFolder(folder);
-  case "Save": return NostalgyMoveToFolder(folder);
+  case "Save": nostalgy_statusbar_nostalgy_label_newRule.setAttribute("hidden" , "true");  
+               return NostalgyMoveToFolder(folder);
   case "Copy": return NostalgyCopyToFolder(folder);
   case "SaveGo": return NostalgyMoveToFolderAndGo(folder);
   default: alert("Unknown command " + spl[1]); return;

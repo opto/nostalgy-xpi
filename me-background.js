@@ -1,7 +1,7 @@
 /*
  * License:  see License.txt
- * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: MIT
- * Code addtions for TB 78 or later: Creative Commons (CC BY-ND 4.0):
+ * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: Zlib
+ * Code additions for TB 78 or later: Creative Commons (CC BY-ND 4.0):
  *      Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0) 
  
  * Contributors:  see Changes.txt
@@ -23,7 +23,7 @@ messenger.runtime.onInstalled.addListener(async ({ reason, temporary }) => {
         const url = messenger.runtime.getURL("popup/installed.html");
 //        const url = messenger.runtime.getURL("popup/about_content.html");
         //await browser.tabs.create({ url });
-        await messenger.windows.create({ url, type: "popup", height: 740, width: 900, });
+        await messenger.windows.create({ url, type: "popup", height: 780, width: 990, });
       }
       break;
       case "update":
@@ -78,7 +78,7 @@ async function main() {
  // xhtml for Tb78
     // messenger.WindowListener.registerWindow("chrome://messenger/content/messenger.xhtml", "chrome/content/scripts/qf-messenger.js");
 
-    messenger.WindowListener.registerWindow("chrome://messenger/content/messenger.xul", "chrome/content/scripts/me-messenger.js");
+ //   messenger.WindowListener.registerWindow("chrome://messenger/content/messenger.xul", "chrome/content/scripts/me-messenger.js");
     messenger.WindowListener.registerWindow("chrome://messenger/content/messenger.xhtml", "chrome/content/scripts/me-messenger.js");
 
     //messenger.WindowListener.registerWindow("chrome://messenger/content/messengercompose.xul", "chrome/content/scripts/qf-composer.js");
@@ -93,7 +93,7 @@ async function main() {
     messenger.WindowListener.registerWindow("chrome://messenger/content/customizeToolbar.xul", "chrome/content/scripts/qf-customizetoolbar.js");
     messenger.WindowListener.registerWindow("chrome://messenger/content/customizeToolbar.xhtml", "chrome/content/scripts/qf-customizetoolbar.js");
 */
-    messenger.WindowListener.registerWindow("chrome://messenger/content/messageWindow.xul", "chrome/content/scripts/me-messageWindow.js");
+//   messenger.WindowListener.registerWindow("chrome://messenger/content/messageWindow.xul", "chrome/content/scripts/me-messageWindow.js");
     messenger.WindowListener.registerWindow("chrome://messenger/content/messageWindow.xhtml", "chrome/content/scripts/me-messageWindow.js");
   //  messenger.WindowListener.registerWindow("chrome://messenger/content/messageWindow.xhtml", "chrome/content/scripts/me-messenger.js");
 

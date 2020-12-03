@@ -1,12 +1,13 @@
  /*
  * License:  see License.txt
- * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: MIT/X11
+ * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: Zlib
  * Code additions for TB 78 or later: Creative Commons (CC BY-ND 4.0):
  *      Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0) 
  
  * Contributors:  see Changes.txt
  */
 
+var { manage_emails } = ChromeUtils.import("chrome://nostalgy/content/manage_emails.jsm");
 
 
 
@@ -98,20 +99,26 @@ function Factory(component) {
     return new component();
   };
   this.register = function() {
-    Components.manager.registerFactory(component.prototype.classID,
+    if (! manage_emails.factory_registered) {
+                      Components.manager.registerFactory(component.prototype.classID,
                        component.prototype.classDescription,
                        component.prototype.contractID,
                        this);
-  };
-  this.unregister = function() {
-    Components.manager.unregisterFactory(component.prototype.classID, this);
-    this.registered--;
-  }
-    Object.freeze(this);
-  if (!this.registered) {
-    this.register();
     this.registered++;
+    manage_emails.factory_registered=true;
+                      }
+                      };
+  this.unregister = function() {
+    if ( manage_emails.factory_registered) {
+         Components.manager.unregisterFactory(component.prototype.classID, this);
+    this.registered--;
+    manage_emails.factory_registered=false;
+    }
   }
+  Object.freeze(this);
+  if (!this.registered || (!manage_emails.factory_registered)) {
+    this.register();
+   }
 }
 
 Factory.prototype = {

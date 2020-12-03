@@ -1,6 +1,6 @@
 /*
  * License:  see License.txt
- * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: MIT/X11
+ * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: Zlib
  * Code additions for TB 78 or later: Creative Commons (CC BY-ND 4.0):
  *      Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0) 
  
@@ -224,14 +224,14 @@ function NostalgyAutocompleteComponent() {
 }
 
 function NostalgyFolderSelectionBox(box) {
-  var cmd = box.getAttribute("nostalgyfolderbox");
+  var cmd = box.getAttribute("nostalgyfolderbox"); //? only for edit.rule??
   if (cmd) {
   //  box.setAttribute("ontextentered",cmd);
   //  box.setAttribute("ontextcommand",cmd);
     box.setAttribute("maxrows","15");
     box.setAttribute("crop","end");
  //not in 78   box.setAttribute("flex","3");
-    box.tabScrolling = false;
+    box.tabScrolling = !nostalgy_completion_options.tab_shell_completion;//false;
   }
 
   box.shell_completion = false;
@@ -239,15 +239,27 @@ function NostalgyFolderSelectionBox(box) {
 
 
   box.onkeypress=function(event){
-    if (event.keyCode == KeyEvent.DOM_VK_TAB && box.getAttribute("normaltab") != "true") {
-      event.preventDefault();
+    if (event.key == "Tab" && box.getAttribute("normaltab") != "true") {
+//      if (event.keyCode == KeyEvent.DOM_VK_TAB && box.getAttribute("normaltab") != "true") {
+        //event.preventDefault();
       if (nostalgy_completion_options.tab_shell_completion) {
+        event.preventDefault();
         box.shell_completion = true;
         box.value = NostalgyCompleteUnique(box.value);
         if (box.controller) // Toolkit only
           box.controller.handleText();
+          
+          return;
       }
     }
+    else 
+    if (event.key == "Enter" && box.getAttribute("normaltab") != "true") {
+      let stpos = box.value.indexOf(">>");
+      if (stpos>-1) box.value = box.value.substr(stpos+3);
+      event.preventDefault();
+         
+          }
+      
   };
 }
 

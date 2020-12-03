@@ -1,6 +1,6 @@
 /*
  * License:  see License.txt
- * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: MIT/X11
+ * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: Zlib
  * Code additions for TB 78 or later: Creative Commons (CC BY-ND 4.0):
  *      Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0) 
  
@@ -13,7 +13,7 @@ var gContainsSelect = null;
 var gUnderSelect = null;
 
 function onNostalgyEditRuleLoad() {
- document.addEventListener("dialogaccept", (event) => { onNostalgyAcceptChanges(); });
+ document.addEventListener("dialogaccept", (event) => { onNostalgyAcceptChanges(event); });
  var rule = window.arguments[0];
  if (!rule) { alert("rule=null!"); }
 
@@ -37,17 +37,30 @@ function onNostalgyEditRuleLoad() {
 
 
 
-function onNostalgyAcceptChanges() {
+function onNostalgyAcceptChanges(event) {
 
 
  var folder = NostalgyFindFolderExact(gFolderSelect.value);
  if (!folder) {
    alert("Please choose an existing folder");
    gFolderSelect.focus();
+   event.preventDefault();
    return false;
  }
+
+ var under = NostalgyFindFolderExact(gUnderSelect.value);
+ if (!under) {
+   alert("Please choose an existing folder");
+   gUnderSelect.focus();
+   event.preventDefault();
+   return false;
+ }
+
+ 
  if (gContainsSelect.value == "") {
    alert("Please provide a non-empty string for 'contains'");
+   gContainsSelect.focus();
+   event.preventDefault();
    return false;
  }
  var rule = { 
@@ -76,7 +89,11 @@ function NostalgyChooseFolder() {
 
 function NostalgyChooseUnder() {
   if (gUnderSelect.value != "") {
-    var under = NostalgyResolveFolder(gUnderSelect.value);
+    let stpos = gUnderSelect.value.indexOf(">>");
+    let foldername = attachment.url.substr(stpos+3);
+    //var spl = gUnderSelect.value.match(/(.*) -> (.*)/);
+
+    var under = NostalgyResolveFolder(foldername);
     if (under) { gUnderSelect.value = NostalgyFolderName(under); }
     setTimeout(function(){gFolderSelect.focus();},30);
   }
@@ -89,6 +106,29 @@ function onNostalgyKeyPressTxt(ev) {
   }
 }
 
+
+
+function onNostalgyInputKeyPressed(ev) {
+  if (ev.key=="Enter"){  //charCode always 0 in 78
+   // ev.preventDefault();
+   NostalgyChooseUnder();
+  NostalgyStopEvent(ev);
+     return;
+  }    
+  else
+  if (ev.key=="Escape"){  //html:input inserts letters 'escape' instead of doing blur 
+    // ev.preventDefault();
+    gUnderSelect.value = "";
+     NostalgyStopEvent(ev);
+ 
+   return;
+   }  
+   //gUnderSelect.value+=  ev.key;
+    return;
+
+}
+
 window.addEventListener("load", onNostalgyEditRuleLoad, false);
+//document.addEventListener("keydown", onNostalgyInputKeyPressed, false); //handler is in folders.js!!
 
-
+//gUnderSelect
