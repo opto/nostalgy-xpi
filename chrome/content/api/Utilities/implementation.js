@@ -32,18 +32,7 @@ var Utilities = class extends ExtensionCommon.ExtensionAPI {
         },
         
  
-        getAddonVersion: function() {
-          return "";//win.QuickFolders.Util.Version;
-        },
-
-        getTBVersion : function() { //somehow(??), we can also get this in MX
-          return Services.appinfo.version;
-        },
-
-
-        getAddonName : function() {
-          return "";//win.QuickFolders.Util.ADDON_NAME;
-        },
+  
         
         openLinkExternally: function(url) {
           let uri = url;

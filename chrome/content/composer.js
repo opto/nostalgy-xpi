@@ -14,7 +14,7 @@ var nostalgy_old_awRecipientKeyPress = 0;
 
 var prefs = PrefBranch();
 
-
+var ccShown=0, bccShown=0;
 
 function nostalgy_awRecipientKeyPress(event, element) {
 /**/
@@ -47,35 +47,65 @@ function NostalgyEscape() {
   var i = NostalgyEscapePressed;
   setTimeout(
     function(){ if (NostalgyEscapePressed==i) NostalgyEscapePressed = 0; },
-    300);
+    450);
   if (NostalgyEscapePressed == 2) setTimeout(SetMsgBodyFrameFocus,0);
 }
 
 function NostalgyKeyPress(ev) {
   //console.log(ev.target.value);
-  if (ev.keyCode == KeyEvent.DOM_VK_ESCAPE) { NostalgyEscape(); }
+  if (ev.key == "Escape" ) { NostalgyEscape(); }
   else if (NostalgyEscapePressed >= 1) {
     if (ev.key =="a") { // A
       goDoCommand('cmd_attachFile');
       NostalgyStopEvent(ev);
     }
     if (ev.key =="b") { // B
-      var label_bcc=window.document.getElementById("addr_bcc");
-      window.showAddressRow(label_bcc, 'addressRowBcc');
-          NostalgyStopEvent(ev);
-    }
-  }
-  if (ev.key =="c") { // C
-    var label_cc=window.document.getElementById("addr_cc");
-    window.showAddressRow(label_cc, 'addressRowCc');
+      if (bccShown) {
+                NostalgyStopEvent(ev);
+        let input =window.document.getElementById("bccAddrInput");
+    //    input.value="";
+        input.focus();
+      }
+      else
+      {
+        var label_bcc=window.document.getElementById("addr_bcc");
+        window.showAddressRow(label_bcc, 'addressRowBcc');
+        bccShown = 1;
         NostalgyStopEvent(ev);
-  }
+      }
+        }
+    if (ev.key =="c") { // C
+      if (ccShown) {
+        let input =window.document.getElementById("ccAddrInput");
+        NostalgyStopEvent(ev);
+        input.focus();
+        }
+      else
+      {
+       var label_cc=window.document.getElementById("addr_cc");
+      window.showAddressRow(label_cc, 'addressRowCc');
+      ccShown = 1;
+      NostalgyStopEvent(ev);
+        }
+      }
+    if (ev.key =="t") { // C
+      let input = window.document.getElementById("toAddrInput");
+      NostalgyStopEvent(ev);
+      input.focus();
+/*
+      var label_to=window.document.getElementById("addr_to");
+      window.showAddressRow(label_to, 'addressRowTo');
+*/
+        }
+            
+      }
 }
 
 
 var manage_emails = {};
 
 var toInputString="";
+
 function toInputUpdateValue(e) {
   console.log("key"+e.key);
  // console.log(e.target.value);
@@ -128,31 +158,43 @@ function toInputUpdateValue(e) {
 var target = window.document.getElementById("headers-box");
 //console.log(target);
 //console.log(target);
-var done=0, ccdone=0, bccdone=0;
+var done=0, ccdone=0, bccdone=0, prefsdone=0;
  observer = new (window.MutationObserver)(function (mutations) {
     //debugger;
     mutations.forEach(function (mutation) {
-      //console.log(mutation.currentTarget );//console.log("Success");
+  //    console.log(mutation );console.log("Success");
         //$('#log').text('input text changed: "' + target.text() + '"');
         //console.log(mutation, mutation.type);
     });
-    try 
+   if (!prefsdone)
+   {
+      try 
 {
-    let showCC = prefs.getBoolPref("extensions.manage_emails.showCC");
-    let showBCC = prefs.getBoolPref("extensions.manage_emails.showBCC");  
-
+    var showCC = prefs.getBoolPref("extensions.manage_emails.showCC");
+    var showBCC = prefs.getBoolPref("extensions.manage_emails.showBCC");  
+ 
     if (showCC) {
       var label_cc=window.document.getElementById("addr_cc");
       window.showAddressRow(label_cc, 'addressRowCc');
+      ccShown = 1;
   
     };
 
     if (showBCC) {
       var label_bcc=window.document.getElementById("addr_bcc");
       window.showAddressRow(label_bcc, 'addressRowBcc');
-  
-    };
+      bccShown = 1;
+    }
+ //back to to:
+    let input = window.document.getElementById("toAddrInput");
+    input.focus();
+    prefsdone = 1;
+    //console.log("prefsdone: "+prefsdone);
 
+    
+
+    }
+/*
     console.log("headers-box changed");
     //to
     var inp = window.document.getElementById("toAddrInput");
@@ -176,18 +218,21 @@ var done=0, ccdone=0, bccdone=0;
    }
    inp.onBeforeHandleKeyDown = toInputUpdateValue;
  //debugger;
+*/
 
-}
 catch(e) {console.log("headers-box not changed");}; 
- /*   */   
+ /*   */
+}
 });
 observer.observe(target, { attributes: true, attributeFilter: ["style"], childList: true, characterData: true, subtree: true });
-console.log("searchDialog-observer");
+//console.log("searchDialog-observer");
 
 function onNostalgyLoadComp(){
   //nostalgy_old_awRecipientKeyPress = window.awRecipientKeyPress;
   //window.awRecipientKeyPress = nostalgy_awRecipientKeyPress;
-  window.addEventListener("keypress", NostalgyKeyPress, false);
+  var showCC = prefs.getBoolPref("extensions.manage_emails.showCC");
+  var showBCC = prefs.getBoolPref("extensions.manage_emails.showBCC");  
+  window.addEventListener("keydown", NostalgyKeyPress, false);
 
   const toInput = NostalgyEBI("toAddrInput");;
   //const log = document.getElementById('values');

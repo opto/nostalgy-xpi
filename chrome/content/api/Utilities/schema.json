@@ -16,28 +16,6 @@
       },
 
  
-      {
-        "name": "getAddonVersion",
-        "type": "function",
-        "async": true,
-        "parameters": []
-      },
-
-      {
-        "name": "getTBVersion",
-        "type": "function",
-        "async": true,
-        "parameters": []
-      },
-
-
-      {
-        "name": "getAddonName",
-        "type": "function",
-        "async": true,
-        "parameters": []
-      },
-
 
       {
         "name": "showXhtmlPage",

@@ -30,7 +30,7 @@
         "description": "Register folders which should be available as chrome:// urls (as defined in the legacy chrome.manifest)",
         "parameters": [
           {
-            "name": "chromeData",
+            "name": "data",
             "type": "array",
             "items": {
               "type": "array",
@@ -38,13 +38,14 @@
                 "type": "string"
               }
             },
-            "description": "Array of ChromeData Arrays."
+            "description": "Array of manifest url definitions (content, locale, resource)"
           }
         ]
       },
       {
         "name": "startListening",
         "type": "function",
+        "async": true,
         "parameters": []
       },
       {
