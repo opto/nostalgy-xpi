@@ -1,6 +1,41 @@
-/* import-globals-from mailWindowOverlay.js */
+ /*
+ * License:  see License.txt
+ * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: MIT/X11
+ * Code addtions for TB 78 or later: Creative Commons (CC BY-ND 4.0):
+ *      Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0) 
+ 
+ * Contributors:  see Changes.txt
+ */
 
 
+var EXPORTED_SYMBOLS = ["Nostalgy"];
+
+var { manage_emails } = ChromeUtils.import("chrome://nostalgy/content/manage_emails.jsm");
+
+
+
+/*var manage_emails = {
+
+  lastContains:"",
+  lastUnder:"",
+  lastFolder:"",
+  lastRule:"",
+  WL: {},
+
+  //propose rule from last copy/move
+  convertToRule: function () {
+    lastRule = { sender:true, recipients:true, subject:false,
+      contains: "", folder: "", under: ""};
+//      contains: this.lastContains, folder: NostalgyFolderName(this.lastFolder), under: NostalgyFolderName(this.lastUnder)};
+      NostalgyEditRule(lastRule, NostalgyCreateItem);
+  }
+
+
+};
+*/
+var Nostalgy = {
+  test:"test"
+}
 
 var nostalgy_in_message_window = !window.SetFocusThreadPane;
 
@@ -8,13 +43,13 @@ var nostalgy_folderBox = null;
 var nostalgy_statusBar = null;
 var nostalgy_label = null;
 var nostalgy_th_statusBar = null;
-var nostalgy_th_statusBar_orig_hidden = false;
+var nostalgy_th_statusBar_orig_hidden = false;  //!!
 var nostalgy_cmdLabel = null;
 var nostalgy_active_keys = { };
 var nostalgy_timeout_regkey = 0;
 var nostalgy_on_move_completed = null;
 var nostalgy_selection_saved = null;
-
+var DELAY_AFTER_CREATING_FOLDER = 200;
 function NostalgyIsDefined(s) {
     return (typeof(window[s]) != "undefined");
 }
@@ -44,7 +79,7 @@ var NostalgyRules =
 
   register: function()
   {
-    this._branch = NostalgyPrefService().getBranch("extensions.nostalgy.");
+    this._branch = PrefService().getBranch("extensions.nostalgy.");
     this._branch2 =
         this._branch.QueryInterface(Components.interfaces.nsIPrefBranch);
     this._branch2.addObserver("", this, false);
@@ -66,12 +101,22 @@ var NostalgyRules =
 
   register_keys: function() {
     nostalgy_active_keys = { };
+    let sCopy="C";
+    let sSave="S";
+    let sGo="G";
     for (var i in nostalgy_keys) {
       var k = "";
+      let sKey= nostalgy_keys[i][0];
       try {
-	k = this._branch.getCharPref("keys." + nostalgy_keys[i][0]);
+	k = this._branch.getCharPref("keys." + sKey);
       } catch (ex) { k = nostalgy_keys[i][2]; }
+      if (sKey=="save") sSave=k;
+      if (sKey=="go") sGo=k;
+      if (sKey=="copy") sCopy=k;
       nostalgy_active_keys[k] = nostalgy_keys[i][3];
+      nostalgy_default_label = "save ("+sSave+") copy (" + sCopy + ") go ("+sGo+")";
+      if (nostalgy_label)
+        nostalgy_label.label = nostalgy_default_label;
     }
 
     var a = this._branch.getChildList("actions.", { });
@@ -94,7 +139,6 @@ var NostalgyRules =
 
   get_rules: function()
   {
-   
     try {
      var r = NostalgyJSONEval(this._branch.getCharPref("rules"));
      var i;
@@ -118,7 +162,7 @@ var NostalgyRules =
     }
     
     
-//        this.rules = [];
+
   },
 
   observe: function(aSubject, aTopic, aData)
@@ -159,7 +203,8 @@ var NostalgyRules =
       if (((r.subject && NostalgyMatchContains(subject,r.contains))
         ||(r.sender && NostalgyMatchContains(sender,r.contains))
         ||(r.recipients && NostalgyMatchContains(recipients,r.contains)))
-         && (current_folder.indexOf(r.under) == 0))
+ //        && (current_folder.indexOf(r.under) == 0))
+         && (current_folder ==r.under))
       {
         folder = NostalgyFindFolderExact(r.folder);
       }
@@ -219,18 +264,29 @@ function NostalgyMailSession() {
 }
 
 function onNostalgyLoad() {
+ // factory.register();
+ //register listeners
+ window.addEventListener("resize", onNostalgyResize, false);
+ window.addEventListener("keypress", onNostalgyKeyPress, false);
+ window.addEventListener("keypress", onNostalgyKeyPressCapture, true);
+ 
+ window.addEventListener("mousedown", NostalgyHideIfBlurred, false);
+ //window.addEventListener("blur", NostalgyHideIfBlurred, false);
+ // Don't know why, but the blur event does not seem to be fired properly...
+
+ 
+ 
+ 
  NostalgyRules.register_keys();
 
- nostalgy_folderBox = NostalgyEBI("nostalgy-folderbox");
- nostalgy_statusBar = NostalgyEBI("nostalgy-statusbar");
- nostalgy_label = NostalgyEBI("statusbar-nostalgy-label");
- nostalgy_th_statusBar = NostalgyEBI("status-bar");
- nostalgy_th_statusBar_orig_hidden= nostalgy_th_statusBar.hidden;
- nostalgy_cmdLabel = NostalgyEBI("nostalgy-command-label");
+ nostalgy_folderBox = NostalgyEBI("nostalgy-folderbox");//c html:input for folders
+ nostalgy_statusBar = NostalgyEBI("nostalgy-statusbar");//c box for folder input
+ nostalgy_label = NostalgyEBI("statusbar-nostalgy-label");//c label for commands list
+ nostalgy_th_statusBar = NostalgyEBI("status-bar");//c main Thunderbird statusbar, containing Nostalgy statusbar
+ nostalgy_cmdLabel = NostalgyEBI("nostalgy-command-label");//c label before folder html:input
  
  NostalgyFolderSelectionBox(nostalgy_folderBox);
- nostalgy_default_label = nostalgy_label.label;
-
+ nostalgy_label.label = nostalgy_default_label;
 
  if (!nostalgy_in_message_window) {
    NostalgyEBI("threadTree").addEventListener("select", NostalgyDefLabel, false);
@@ -243,14 +299,12 @@ function onNostalgyLoad() {
    };
  }
 
- window.addEventListener("mousedown", NostalgyHideIfBlurred, false);
- // Don't know why, but the blur event does not seem to be fired properly...
-
+ 
  var mSession = NostalgyMailSession();
  var nsIFolderListener = Components.interfaces.nsIFolderListener;
  if (mSession)
    mSession.AddFolderListener(NostalgyFolderListener,
-      nsIFolderListener.added | nsIFolderListener.removed | nsIFolderListener.event);
+                              nsIFolderListener.added | nsIFolderListener.removed | nsIFolderListener.event);
 }
 
 
@@ -258,8 +312,18 @@ function onNostalgyUnload() {
  var mSession = NostalgyMailSession();
  if (mSession) mSession.RemoveFolderListener(NostalgyFolderListener);
  NostalgyRules.unregister();
+ //autocompleteFactory.unregister();
+ factory.unregister();
+
+ //remove listeners
+ window.removeEventListener("resize", onNostalgyResize);
+ window.removeEventListener("keypress", onNostalgyKeyPress);
+ window.removeEventListener("keypress", onNostalgyKeyPressCapture);
+ window.removeEventListener("mousedown", NostalgyHideIfBlurred);
+ 
 }
 
+//onmousedown, hide input (NostalgyHide) in statusbar if: a) it is shown, b) folderbox or its inputfield  both are not focussed
 function NostalgyHideIfBlurred() {
   setTimeout(function (){
       var focused = document.commandDispatcher.focusedElement;
@@ -282,35 +346,25 @@ function NostalgyHide(restore) {
 }
 
 function NostalgyDefLabel() {
-nostalgy_th_statusBar.hidden=false;
-
  nostalgy_gsuggest_folder = NostalgySuggest();
  if (nostalgy_gsuggest_folder) {
-   nostalgy_label.label =
+   nostalgy_label.value =
        nostalgy_default_label + " [+Shift: => " + NostalgyFolderName(nostalgy_gsuggest_folder) + "]";
+ //  nostalgy_label.hidden="false"; 
+   nostalgy_label.setAttribute("hidden" , "false");  
  } else {
-   nostalgy_label.label = nostalgy_default_label;
+   nostalgy_label.value = nostalgy_default_label;
+   nostalgy_label.setAttribute("hidden" , "false");  
+//   nostalgy_label.hidden="false";
  }
 }
 
 
 function NostalgyCollapseFolderPane() {
  var fp = NostalgyEBI("folderPaneBox");
-// alert("there");
  if (window.MsgToggleFolderPane)
    { 
-/*  var splitter = document.getElementById("folderpane_splitter");
-  var state = splitter.getAttribute("state");
-  if (state == "collapsed") {
-    splitter.setAttribute("state", "open");
-  } else {
-    splitter.setAttribute("state", "collapsed");
-    }
-*/
-    //   fp = NostalgyEBI("folderpane_splitter");
-  // fp.state="collapsed";
    MsgToggleFolderPane();
- //  goDoCommand('cmd_toggleFolderPane'); 
    return true; }
  else if (window.MsgToggleSplitter)
    { MsgToggleSplitter("gray_vertical_splitter"); return true; }
@@ -322,14 +376,15 @@ function NostalgyCollapseFolderPane() {
 
 
 function NostalgyCmd(lab,cmd,require_file) {
+ //c where to refocus after action:
  nostalgy_focus_saved = document.commandDispatcher.focusedElement;
  if (!nostalgy_focus_saved) { nostalgy_focus_saved = NostalgyEBI("messagepane").contentWindow; }
 
  nostalgy_search_folder_options.require_file = require_file;
  nostalgy_cmdLabel.value = lab;
  nostalgy_command = cmd;
-// nostalgy_th_statusBar_orig_hidden = nostalgy_th_statusBar.hidden;
- nostalgy_th_statusBar.hidden = true;
+ nostalgy_th_statusBar_orig_hidden = nostalgy_th_statusBar.hidden;
+ nostalgy_th_statusBar.hidden = false;//!!
  nostalgy_folderBox.shell_completion = false;
  nostalgy_statusBar.hidden = false;
  nostalgy_folderBox.value = "";
@@ -347,10 +402,12 @@ function NostalgyCmd(lab,cmd,require_file) {
 }
 
 function NostalgyShowRecentFoldersList() {
+  nostalgy_label.hidden="true";
   var listener = null;
   var box = nostalgy_folderBox;
-  if (box.controller) // Toolkit
+  if (box.controller) {// Toolkit
     listener = box.controller.QueryInterface(Components.interfaces.nsIAutoCompleteObserver);
+	}
   else { // XPFE
     // box.mAutoCompleteObserver uses a flawed equality check so we have to replace it.
     // Since we only use one autocompleter, its name is equal to the autocompletesearch attribute.
@@ -376,7 +433,7 @@ function NostalgyCreateTag(name) {
  var args = {result: "", keyToEdit: key,
              okCallback: function(){ ok = true; } };
  var dialog = window.openDialog(
-                              "chrome://messenger/content/newTagDialog.xul",
+                              "chrome://messenger/content/newTagDialog.xhtml",
                               "",
                               "chrome,titlebar,modal",
                               args);
@@ -428,7 +485,7 @@ function NostalgyRunCommand() {
                         }
                         else
                             alert("No folder " + s);
-                    }, 200);
+                    }, DELAY_AFTER_CREATING_FOLDER);
             } else
                 return;
         } else
@@ -493,6 +550,8 @@ function NostalgySuggest() {
  var r = null;
  if (!gDBView) return;
  var folder = NostalgyCurrentFolder();
+ manage_emails.lastUnder = folder;
+ manage_emails.lastContains = NostalgyMailAuthor();
  try {
      if (folder) r = NostalgyRules.apply(NostalgyMailAuthor(), NostalgyMailSubject(), NostalgyMailRecipients(), folder);
      if (r) { return(r); }
@@ -625,6 +684,7 @@ function NostalgyToggleMessageTag(tag) {
 }
 
 function NostalgyMoveToFolder(folder) {
+ manage_emails.lastFolder = folder;
  NostalgyRegisterFolder(folder);
  if (window.SetNextMessageAfterDelete) SetNextMessageAfterDelete();
  else gFolderDisplay.hintAboutToDeleteMessages();
@@ -715,13 +775,19 @@ var nostalgy_last_cycle_restrict = 0;
 var nostalgy_last_cycle_saved_searchMode = 0;
 
 function NostalgySearchSenderQuickFilter() {
+//  function NostalgySearchSenderQuickFilter(sender, recipient, subject) {
     // TB 3.1
     var input = NostalgyEBI("qfb-qs-textbox");
     if (!input) return false;
-
+/*
+    if (sender == null) sender = NostalgyMailAuthorName();
+    if (recipient == null)     recipient = NostalgyMailRecipName();
+    if (subject == null)     subject = NostalgyMailSubject();
+*/
     var sender = NostalgyMailAuthorName();
     var recipient = NostalgyMailRecipName();
     var subject = NostalgyMailSubject();
+
 
     var values = { sender: sender, subject: subject, recipients: recipient };
     if (NostalgyCurrentFolder().displayRecipients)
@@ -823,54 +889,71 @@ function NostalgySearchSender() {
 }
 
 function onNostalgyKeyPressCapture(ev) {
-nostalgy_th_statusBar.hidden=false;
-    if (ev.keyCode == KeyEvent.DOM_VK_ESCAPE)
+    if (ev.key == "Escape")
         NostalgyEscape();
 
   var focused = "";
   try { focused = document.commandDispatcher.focusedElement.nodeName; }
   catch (ex) { }
-  if (!nostalgy_statusBar.hidden && focused != "html:input")
+  if (!nostalgy_statusBar.hidden && focused != "html:input"   && focused != "input")
     {
     // ugly hack: it takes some time for the folderBox to be focused
-    if (ev.charCode) {
+    if (ev.key) {
       nostalgy_folderBox.value =  nostalgy_folderBox.value +
-          String.fromCharCode(ev.charCode);
+          ev.key;//String.fromCharCode(ev.charCode);
     }
     NostalgyStopEvent(ev);
     return;
   }
 }
 
+function onNostalgyInputKeyPressed(ev) {
+  if (ev.key=="Enter"){  //charCode always 0 in 78
+   // ev.preventDefault();
+    NostalgyRunCommand();
+    return;
+  }    
+  else
+  if (ev.key=="Escape"){  //html:input inserts letters 'escape' instead of doing blur 
+    // ev.preventDefault();
+    NostalgyHide();
+    NostalgyFocusThreadPane();
+    NostalgyStopEvent(ev);
+   return;
+   }    
+    return;
+
+}
 
 function onNostalgyKeyPress(ev) {
-nostalgy_th_statusBar.hidden=false;
   if (!nostalgy_statusBar.hidden) return;
 
   if (NostalgyEscapePressed >= 1) {
-    if (!nostalgy_in_message_window && ev.charCode == 109) { // M
+    if (!nostalgy_in_message_window && ev.key == "m") { // M
       NostalgyFocusMessagePane();
       NostalgyStopEvent(ev);
     } else
-    if (!nostalgy_in_message_window && ev.charCode == 102) { // F
+    if (!nostalgy_in_message_window && ev.key == "f") { // F
       document.getElementById("folderTree").focus();
       NostalgyStopEvent(ev);
-    }
+    } 
     return;
   }
 
   var kn = NostalgyRecognizeKey(ev);
-    if (ev.charCode && (ev.originalTarget.localName.toLowerCase() == "input"
-                        || ev.originalTarget.localName.toLowerCase() == "textarea")
-      && !ev.ctrlKey && !ev.altKey)
-    return;
+  let focusWhere= ev.originalTarget.localName.toLowerCase();
+    if (( focusWhere == "html:input"    ||    focusWhere == "input" //sometimes input, sometimes html:input
+                        || focusWhere == "textarea")
+ //     && !(ev.code =="Alt") && !(ev.code=="Control")
+      )   {
+ 
+         return;
+       }
   var k = nostalgy_active_keys[kn];
   if (k && NostalgyParseCommand(k)) NostalgyStopEvent(ev);
 }
 
 function NostalgyParseCommand(k) {
- // if (k=="JS:NostalgyCollapseFolderPane();")
-//    return NostalgyCollapseFolderPane();
   if (k.indexOf("JS:") == 0)
     return eval(k.substr(3,k.length - 3));
 
@@ -911,10 +994,6 @@ function NostalgySaveAndGoSuggested() {
   return true;
 }
 
-window.addEventListener("load", onNostalgyLoad, false);
-window.addEventListener("resize", onNostalgyResize, false);
-window.addEventListener("unload", onNostalgyUnload, false);
-window.addEventListener("keypress", onNostalgyKeyPress, false);
-window.addEventListener("keypress", onNostalgyKeyPressCapture, true);
+//!window.addEventListener("load", onNostalgyLoad, false);
 Components.classes["@mozilla.org/xre/app-info;1"].
     getService(Components.interfaces.nsIXULRuntime).invalidateCachesOnRestart();

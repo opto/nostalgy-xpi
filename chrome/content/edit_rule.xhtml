@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+
+<!--
+/*
+* License:  see License.txt
+* Code until Nostalgy 0.3.0/Nostalgy 1.1.15: MIT/X11
+ Code additions for TB 78 or later: Creative Commons (CC BY-ND 4.0):
+      Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0) 
+
+* Contributors:  see Changes.txt
+ */
+
+-->
+
+
+<!DOCTYPE window  SYSTEM "chrome://nostalgy/locale/nostalgy.dtd">
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<dialog
+        xmlns:html="http://www.w3.org/1999/xhtml"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        title="Edit Nostalgy Rule"
+	buttons="accept,cancel"
+
+>
+
+ <script src="chrome://nostalgy/content/misc.js"/>
+ <script src="chrome://nostalgy/content/nostalgy-autocomplete.js"/>
+ <script src="chrome://nostalgy/content/folders.js"/>
+  <script src="chrome://nostalgy/content/edit_rule.js"/>
+
+<vbox style="width:750px">
+ <groupbox>
+
+<grid flex="1">
+  <columns>
+    <column flex="0"/>
+    <column flex="1"/>
+  </columns>
+
+  <rows>
+    <row>
+      <label value="Look header(s)"/>
+      <hbox>
+      <checkbox id="sender" label="From"/>  
+      <checkbox id="recipients" label="To/Cc"/>  
+      <checkbox id="subject" label="Subject"/>  
+      </hbox>
+   </row>
+
+    <row>
+      <label value="for substring"/>
+      <html:input is="autocomplete-input" id="contains"
+                            type="text"
+                            
+                            disableonsend="true"
+                            autocompletesearch="mydomain addrbook ldap news"
+                            autocompletesearchparam="{}"
+                            timeout="300"
+                            maxrows="10"
+                            completedefaultindex="true"
+                            forcecomplete="true"
+                            completeselectedindex="true"
+                            minresultsforpopup="2"
+                            ignoreblurwhilesearching="true"
+                        
+                            onkeypress="onNostalgyKeyPressTxt(event);"
+                     
+                          
+                            recipienttype="addr_to"
+                            size="1"     />
+    </row>
+
+  <row>
+    <label value="when message is under folder"/>
+      <html:input is="autocomplete-input" id="underselect"
+                            type="text"
+                            
+                            disableonsend="true"
+                            autocompletesearch="nostalgy-autocomplete"
+                            autocompletesearchparam="{}"
+                            timeout="300"
+                            maxrows="10"
+                            completedefaultindex="true"
+                            forcecomplete="true"
+                            completeselectedindex="true"
+                            minresultsforpopup="2"
+                            ignoreblurwhilesearching="true"
+                            nostalgyfolderbox="NostalgyChooseUnder();"
+                     
+                          
+                            recipienttype="addr_to"
+                            size="1"     />
+
+    </row>
+
+    
+
+    <row>
+      <label value="then save to"/>
+      <html:input is="autocomplete-input" id="folderselect"
+                            type="text"
+                            
+                            disableonsend="true"
+                            autocompletesearch="nostalgy-autocomplete"
+                            autocompletesearchparam="{}"
+                            timeout="300"
+                            maxrows="10"
+                            completedefaultindex="true"
+                            forcecomplete="true"
+                            completeselectedindex="true"
+                            minresultsforpopup="2"
+                            ignoreblurwhilesearching="true"
+                            nostalgyfolderbox="NostalgyChooseFolder();"
+                     
+                          
+                            recipienttype="addr_to"
+                            size="1"     />
+
+  </row>
+  </rows>
+</grid>
+ </groupbox>
+
+</vbox>
+
+</dialog>

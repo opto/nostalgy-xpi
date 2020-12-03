@@ -1,15 +1,17 @@
+Nostalgy++ 2.2
+  - Update code for TB 78
+  - New functions: (n)ew rule from main window
+                   (e) convert last move operation to rule
+                   always show cc or bcc line in compose
+		               apply rules from settings window
+		               Thunderbird restart button (closes all windows) in settings tab
 
-1.0.15  
-  - Update code for TB 68
-  - Add restart button for TB to utilities tab
 
-Changes in Nostalgy (original version)  
-  
-Next version (originally planned by Alain, maybe obsolete now)
-  - #24: config setting for custom timeout after creating folder before moving email to it (Adam Kerz)
+Nostalgy++ 1.0.15, Nostalgy 0.3.0
+  - Update code for TB 68 (contributed by Klaus Buecher)
+  - All code before Nostalgy 0.3.0: Alain Frisch (original author) and others, as specified below
+  - (#24: config setting for custom timeout after creating folder before moving email to it (Adam Kerz))
   - #60, #62: fix for TB 60.3 (h271fa GitHub user)
-  
-  
   
 0.2.36
   - Fix for TB 60 (thanks to lepokle GitHub user)

@@ -1,21 +1,49 @@
 {
 	"manifest_version": 2,
-	"name": "Nostalgy++",
-  "description": "Adds shortcuts to change folder, move/copy messages, with folder completion, and other utilities to archive or organise emails",
-	"version": "1.0.15",
+	"name": "Manage Emails/ Nostalgy++",
+  "description": "Adds shortcuts to change folder, move/copy messages, with folder completion, and other utilities to archive or organise emails. User instructions at tools->addon settings->nostalgy++->  Nostalgy++ usage directions",
+	"version": "2.2.0",
 	"author": "Alain Frisch, opto (Klaus Buecher)",
 	"developer": {
 		"name": "Alain Frisch, opto (Klaus Buecher)"
 	},
- "legacy": {
-    "type": "xul"
-    
-  },
-  
+ 
 	"applications": {
 		"gecko": {
 			"id": "nostalgy@opto.one",
-			"strict_min_version": "68.0"
+			"strict_min_version": "78.0"
 		}
-	}
+	},
+	"background": {
+		"scripts": ["me-background.js"]
+	  },
+	  "experiment_apis": {
+		"WindowListener": {
+		  "schema": "chrome/content/api/WindowListener/schema.json",
+		  "parent": {
+			"scopes": ["addon_parent"],
+			"paths": [["WindowListener"]],
+			"script": "chrome/content/api/WindowListener/implementation.js"
+		  }
+		},  
+		"LegacyPrefs": {
+		  "schema": "chrome/content/api/LegacyPrefs/schema.json",
+		  "parent": {
+			"scopes": ["addon_parent"],
+			"paths": [["LegacyPrefs"]],
+			"script": "chrome/content/api/LegacyPrefs/implementation.js"
+		  
+		  }
+		},
+		"Utilities": {
+		  "schema": "chrome/content/api/Utilities/schema.json",
+		  "parent": {
+			"scopes": ["addon_parent"],
+			"paths": [["Utilities"]],
+			"script": "chrome/content/api/Utilities/implementation.js"
+		  
+		   }
+		}
+		  }
 }
+                                                                                                                                                        

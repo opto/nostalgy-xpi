@@ -1,8 +1,18 @@
-var gFolderSelect = null;
+/*
+ * License:  see License.txt
+ * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: MIT/X11
+ * Code additions for TB 78 or later: Creative Commons (CC BY-ND 4.0):
+ *      Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0) 
+ 
+ * Contributors:  see Changes.txt
+ */
+
+
+gFolderSelect = null;
 var gContainsSelect = null;
 var gUnderSelect = null;
 
-function onNostalgyLoad() {
+function onNostalgyEditRuleLoad() {
  document.addEventListener("dialogaccept", (event) => { onNostalgyAcceptChanges(); });
  var rule = window.arguments[0];
  if (!rule) { alert("rule=null!"); }
@@ -13,6 +23,7 @@ function onNostalgyLoad() {
  gFolderSelect = NostalgyEBI("folderselect");
  gUnderSelect = NostalgyEBI("underselect");
 
+ 
  gContainsSelect.focus();
 
  gFolderSelect.value = rule.folder;
@@ -24,11 +35,7 @@ function onNostalgyLoad() {
 }
 
 
-function onNostalgyUnLoad() {
-                alert("unload");
-// document.removeEventListener("dialogaccept", (event) => { onNostalgyAcceptChanges(); });
 
-}
 
 function onNostalgyAcceptChanges() {
 
@@ -51,8 +58,11 @@ function onNostalgyAcceptChanges() {
     folder: NostalgyFolderName(folder),
     under: gUnderSelect.value
  };
-    
- (window.arguments[1])(rule);
+ 
+ let action=null;
+ if (window.arguments[1] == null)  action = "NostalgyCreateItem"  ; else action = window.arguments[1];
+ //(window.arguments[1])(rule);
+ (action)(rule);
 
  return true;
 }
@@ -79,6 +89,6 @@ function onNostalgyKeyPressTxt(ev) {
   }
 }
 
-window.addEventListener("load", onNostalgyLoad, false);
+window.addEventListener("load", onNostalgyEditRuleLoad, false);
 
-window.addEventListener("unload", onNostalgyUnLoad, false);
+

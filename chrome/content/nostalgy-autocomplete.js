@@ -1,14 +1,25 @@
-const Cc = Components.classes;
-const Ci = Components.interfaces;
-const Cu = Components.utils;
+ /*
+ * License:  see License.txt
+ * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: MIT/X11
+ * Code additions for TB 78 or later: Creative Commons (CC BY-ND 4.0):
+ *      Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0) 
+ 
+ * Contributors:  see Changes.txt
+ */
+
+
+
+
+Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
+
 
 var {XPCOMUtils} = ChromeUtils.import('resource://gre/modules/XPCOMUtils.jsm');
+var {Services} = ChromeUtils.import("resource://gre/modules/Services.jsm");
 
 
-
-const CLASS_ID = Components.ID('0368fb30-62f8-11e3-949a-0800200c9a66');
-const CLASS_NAME = "Nostalgy Folder Autocomplete";
-const CONTRACT_ID = '@mozilla.org/autocomplete/search;1?name=nostalgy-autocomplete';
+var CLASS_ID = Components.ID('0368fb30-62f8-11e3-949a-0800200c9a66');
+var CLASS_NAME = "Nostalgy Folder Autocomplete";
+var CONTRACT_ID = '@mozilla.org/autocomplete/search;1?name=nostalgy-autocomplete';
 
 
 // nsIAutoCompleteResult implementation
@@ -76,4 +87,34 @@ NostalgyAutoCompleteSearch.prototype = {
 
 // XPCOM component creation
 
-const NSGetFactory = XPCOMUtils.generateNSGetFactory([ NostalgyAutoCompleteSearch ]);
+//const NSGetFactory = XPCOMUtils.generateNSGetFactory([ NostalgyAutoCompleteSearch ]);
+
+
+function Factory(component) {
+  this.createInstance = function(outer, iid) {
+    if (outer) {
+      throw Cr.NS_ERROR_NO_AGGREGATION;
+    }
+    return new component();
+  };
+  this.register = function() {
+    Components.manager.registerFactory(component.prototype.classID,
+                       component.prototype.classDescription,
+                       component.prototype.contractID,
+                       this);
+  };
+  this.unregister = function() {
+    Components.manager.unregisterFactory(component.prototype.classID, this);
+    this.registered--;
+  }
+    Object.freeze(this);
+  if (!this.registered) {
+    this.register();
+    this.registered++;
+  }
+}
+
+Factory.prototype = {
+registered:0
+}
+var factory = new Factory(NostalgyAutoCompleteSearch);

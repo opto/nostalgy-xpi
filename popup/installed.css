@@ -1,0 +1,55 @@
+/*
+ * License:  see License.txt
+ * Code addtions for TB 78 or later: Creative Commons (CC BY-ND 4.0):
+ *      Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0) 
+ 
+ * Contributors:  see Changes.txt
+ */
+
+
+ ul.actions {
+  
+}
+
+.actionlinks {
+  text-align: center;
+}
+
+.actionlinks a {
+  background-color: darkred;
+  box-shadow: 5px 5px 5px rgba(50,50,50,0.5);
+  color: white;
+  padding: 5px 8px;
+  cursor: pointer;
+}
+
+.actionlinks a:hover {
+  background-image: linear-gradient(to bottom, #6d0019 0%,#8f0222 34%,#e20425 100%);
+}
+
+.actionlinks a:active {
+  background-image: linear-gradient(to bottom, #633b00 0%,#750202 34%,#ef8204 100%);
+}
+
+body * {
+  background-color: white;
+}
+
+h1, h2, h3, h4 {
+  color: #1a566d;
+  font-family: Impact,Haettenschweiler,Franklin Gothic Bold,Charcoal,Helvetica Inserat,Bitstream Vera Sans Bold,Arial Black,sans serif;
+  text-align: center;
+}
+
+h1 {
+  font-size: 20pt;
+}
+
+h2 {
+  font-size: 16pt;
+  font-weight: normal;
+}
+
+h3 {
+  font-size: 13pt;
+}

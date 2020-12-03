@@ -1,4 +1,23 @@
 <?xml version="1.0"?>
+
+<!--
+/*
+* License:  see License.txt
+* Code until Nostalgy 0.3.0/Nostalgy 1.1.15: MIT/X11
+ Code additions for TB 78 or later: Creative Commons (CC BY-ND 4.0):
+      Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0) 
+
+* Contributors:  see Changes.txt
+ */
+
+-->
+
+
+
+
+
+
+
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet type="text/css" href="chrome://messenger/skin/messenger.css"?>
 
@@ -8,25 +27,25 @@
 <dialog
         xmlns:html="http://www.w3.org/1999/xhtml"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-	buttons="accept,extra2"
-	ondialogaccept="return onNostalgyAcceptChanges();"
-	ondialogextra2="openDialog('chrome://nostalgy/content/about.xul', 'about_nostalgy++', 'resizable');"
-	buttonlabelextra2="Nostalgy++ usage directions..."
+	      buttons="accept,extra2"
+	      buttonlabelextra2="Nostalgy++ usage directions..."
         width="900"
         height="500"
-        title="Nostalgy++ Preferences">
+        title="Nostalgy Preferences">
 
- <script src="misc.js"/>
- <script src="folders.js"/>
- <script src="nostalgy_keys.js"/>
- <script src="edit_prefs.js"/>
-
+ <script src="chrome://nostalgy/content/manage_emails.js"/>
+ <script src="chrome://nostalgy/content/misc.js"/>
+ <script src="chrome://nostalgy/content/folders.js"/>
+ <script src="chrome://nostalgy/content/nostalgy_keys.js"/>
+ <script src="chrome://nostalgy/content/edit_prefs.js"/>
+ <script src="chrome://nostalgy/content/nostalgy.js"/>
  <tabbox flex="0" style="width:600px">
  <tabs>
  <tab label="Rules"/>
  <tab label="Completion"/>
  <tab label="Keys"/>
- <tab label="Utilities"/>
+ <tab label="Compose Dialog"/>
+  <tab label="Utilities"/>
  </tabs>
  <tabpanels>
 
@@ -35,7 +54,7 @@
  <label>Rules associate folders to messages by looking for a
 substring of the Sender or Subject (or both) headers. A rule can be
 restricted to match messages under a given server/folder. When a folder
-is selected for a given message, Nostalgy++ informs you in the status line.
+is selected for a given message, Nostalgy informs you in the status line.
 You can then use the Shift-S/Shift-C
 shortcuts to move/copy the message to this folder.</label>   
  <vbox >
@@ -65,6 +84,7 @@ shortcuts to move/copy the message to this folder.</label>
   <button label="Edit" accesskey="E" oncommand="NostalgyDoEdit();"/>
   <button label="Delete" accesskey="D" oncommand="NostalgyDoDelete();"/>
   <button label="New" accesskey="N" oncommand="NostalgyDoNewRule();"/>
+  <button label="Apply Rule" accesskey="A" oncommand="manage_emails.applyRule();"/>
   <separator orient="vertical"/>
   <button label="Move up" accesskey="U" oncommand="NostalgyDoMoveUp();"/>
   <button label="Move down" accesskey="W" oncommand="NostalgyDoMoveDown();"/>
@@ -96,11 +116,11 @@ shortcuts to move/copy the message to this folder.</label>
              id="use_statistical_prediction"/>
    <hbox align="center">
      <label>Number of recent folders to remember:</label>
-     <textbox type="number" min="0" max="50" id="number_of_recent_folders"/>
+     <html:input type="number" min="0" max="50" id="number_of_recent_folders"/>
    </hbox>
    <hbox align="center">
      <label>Number of addresses to consider for statistical prediction:</label>
-     <textbox type="number" min="0" max="99999" id="predict_max_addresses_to_update"/>
+     <html:input type="number" min="0" max="99999" id="predict_max_addresses_to_update"/>
    </hbox>
  </groupbox>
  </tabpanel>
@@ -108,7 +128,7 @@ shortcuts to move/copy the message to this folder.</label>
  <tabpanel>
  <groupbox flex="1">
    <grid style="overflow:auto; height:300px">
-   <columns> <column/> <column width="150"/> <column/> </columns>
+   <columns> <column  width="300"/> <column width="150"/> <column/> </columns>
    <rows id="nostalgy_key_rows"/>
    </grid>
   <separator orient="horizontal"/>
@@ -119,7 +139,7 @@ shortcuts to move/copy the message to this folder.</label>
   <radio value="Copy" label="Copy"/>
   <radio value="SaveGo" label="Save+Go"/>
   </radiogroup>
-  <textbox style="width:600px" type="autocomplete" id="folderselect"
+  <html:input style="width:600px" type="autocomplete" id="folderselect"
            autocompletesearch="nostalgy-autocomplete"
            completeselectedindex="true"
            nostalgyfolderbox="NostalgySelectFolder();"/>
@@ -128,9 +148,34 @@ shortcuts to move/copy the message to this folder.</label>
  </groupbox>
  </tabpanel>
 
+
  <tabpanel>
  <groupbox flex="1">   
- <label>This has some utility functions in addition to standard nostalgy++ functions</label>   
+ <label>Always show the cc or bcc line in compose dialog?</label>   
+ <vbox >
+  <checkbox label="Always show cc line in compose"
+             id="always_cc" accesskey="C"/>
+   <checkbox label="Always show bcc line in compose"
+             id="always_bcc" accesskey="B"/>
+ <hbox >
+
+
+
+
+ </hbox >
+ </vbox>
+
+ <vbox align="center">
+  <hbox>
+  </hbox>
+ </vbox>
+ </groupbox>
+ </tabpanel>
+
+
+ <tabpanel>
+ <groupbox flex="1">   
+ <label>This has some utility functions in addition to standard nostalgy functions</label>   
  <vbox >
  <hbox >
 

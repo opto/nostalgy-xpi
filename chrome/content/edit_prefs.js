@@ -1,3 +1,38 @@
+/*
+ * License:  see License.txt
+ * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: MIT/X11
+ * Code additions for TB 78 or later: Creative Commons (CC BY-ND 4.0):
+ *      Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0) 
+ 
+ * Contributors:  see Changes.txt
+ */
+
+
+
+var { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
+
+var { manage_emails } = ChromeUtils.import("chrome://nostalgy/content/manage_emails.jsm");
+
+
+manage_emails.applyRule= function applyRule(rule) {
+  let item = nostalgy_gList.selectedItem;
+  console.log("applyrule1");
+  //console.log(this.getCurrentFolder());
+  //console.log(item);
+  let rule2apply = NostalgyRuleOfItem(item);
+  console.log(rule2apply);
+  let currentFolder = this.getCurrentFolder();
+  console.log(currentFolder);
+  this.showFolder(rule2apply.under);
+  //NostalgyDoSearch(rule2apply.contains);
+  var input = this.getMainWindowElement("qfb-qs-textbox");
+  //input.value= rule2apply.contains;
+  this.setQuickFilter(rule2apply);
+  
+
+}
+
+
 var nostalgy_gList = null;
 
 var nostalgy_wait_key = null;
@@ -62,25 +97,25 @@ function NostalgySetItem(item, rule) {
   if (rule.subject) lab = lab + "S";
 
   f.setAttribute("value", lab);
-  f.setAttribute("label", lab);
+  //f.setAttribute("label", lab);
   f.setAttribute("align", "center");
-  item.childNodes.item(1).setAttribute("label", rule.contains);
+  //item.childNodes.item(1).setAttribute("label", rule.contains);
   item.childNodes.item(1).setAttribute("value", rule.contains);
 
   var u = "";
   if (rule.under) { u = rule.under; }
   item.childNodes.item(2).setAttribute("value", u);
-  item.childNodes.item(2).setAttribute("label", NostalgyCrop(u));
+  //item.childNodes.item(2).setAttribute("label", NostalgyCrop(u));
 
   item.childNodes.item(3).setAttribute("value", rule.folder);
-  item.childNodes.item(3).setAttribute("label", NostalgyCrop(rule.folder));
+//  item.childNodes.item(3).setAttribute("label", NostalgyCrop(rule.folder));
 }
 
 function NostalgyRuleOfItem(item) {
  var fields = item.childNodes.item(0).getAttribute("value");
  return ({ folder: item.childNodes.item(3).getAttribute("value"),
            under: item.childNodes.item(2).getAttribute("value"),
-	   contains: item.childNodes.item(1).getAttribute("label"),
+	         contains: item.childNodes.item(1).getAttribute("value"),
            sender: fields.indexOf("F") >= 0,
            recipients: fields.indexOf("R") >= 0,
            subject: fields.indexOf("S") >= 0 });
@@ -135,7 +170,7 @@ function NostalgyMkPrefStr() {
 
 
 function NostalgyEditRule(rule, accept) {
-  window.openDialog("chrome://nostalgy/content/edit_rule.xul",
+  window.openDialog("chrome://nostalgy/content/edit_rule.xhtml",
                      "_blank",
 	             "dialog,chrome,modal,titlebar,resizable=yes",
 	             rule,accept);
@@ -175,7 +210,7 @@ function NostalgyDoMoveDown(idx1,idx2) {
 }
 
 function onNostalgyAcceptChanges() {
-  var prefs = NostalgyPrefBranch();
+  var prefs = PrefBranch();
   prefs.setCharPref("extensions.nostalgy.rules", NostalgyMkPrefStr());
   try {
       prefs.setIntPref("extensions.nostalgy.number_of_recent_folders", 0 + NostalgyEBI("number_of_recent_folders").value);
@@ -191,11 +226,16 @@ function onNostalgyAcceptChanges() {
   for (var n in nostalgy_completion_options)
     prefs.setBoolPref("extensions.nostalgy."+n,	NostalgyEBI(n).checked);
 
+    prefs.setBoolPref("extensions.manage_emails.showCC",	NostalgyEBI("always_cc").checked);
+    prefs.setBoolPref("extensions.manage_emails.showBCC",	NostalgyEBI("always_bcc").checked);  
+
   if (nostalgy_wait_key) { nostalgy_wait_key.value = nostalgy_wait_key_old; nostalgy_wait_key = null; }
-  for (var i in nostalgy_keys)
+  for (var i in nostalgy_keys) {
+    let sKey= nostalgy_keys[i][0];
+    let sValue= NostalgyEBI("key_" + nostalgy_keys[i][0]).value;
     prefs.setCharPref(nostalgy_kKeysPrefs+nostalgy_keys[i][0],
     NostalgyEBI("key_" + nostalgy_keys[i][0]).value);
-
+  }
 
   var a = prefs.getChildList(nostalgy_kKeysPrefs, { });
   for (var i in a) {
@@ -222,6 +262,20 @@ function onNostalgyAcceptChanges() {
 function NostalgyDoNewRule() {
   NostalgyEditRule({ sender:true, recipients:true, subject:true,
              contains:"", folder:"", under:"" }, NostalgyCreateItem);
+}
+
+manage_emails.ConvertToNewRule = function ConvertToNewRule() {
+  var folder1 = NostalgyFullFolderName(window.arguments[1].lastFolder); // window.arguments[1].lastFolder
+  var under1 = NostalgyFullFolderName(window.arguments[1].lastUnder);   // window.arguments[1].lastUnder
+  NostalgyEditRule({ sender:true, recipients:true, subject:false,
+             contains: window.arguments[1].lastContains, folder: folder1, under: under1 }, NostalgyCreateItem);
+}
+
+function NostalgyConvertToNewRule() {
+  var folder1 = NostalgyFullFolderName(window.arguments[1].lastFolder); // window.arguments[1].lastFolder
+  var under1 = NostalgyFullFolderName(window.arguments[1].lastUnder);   // window.arguments[1].lastUnder
+  NostalgyEditRule({ sender:true, recipients:true, subject:false,
+             contains: window.arguments[1].lastContains, folder: folder1, under: under1 }, NostalgyCreateItem);
 }
 
 function NostalgyDoDelete() {
@@ -252,7 +306,7 @@ function NostalgyGetIntPref(prefs,s,def) {
 }
 
 function NostalgyCreateElem(tag,attrs,children) {
- var x = document.createElement(tag);
+ var x = document.createXULElement(tag);
  for (var a in attrs) x.setAttribute(a,attrs[a]);
  if (children) for (var i in children) x.appendChild(children[i]);
  return x;
@@ -267,30 +321,34 @@ function NostalgyCreateKeyRow(id,txt,v) {
   else
    buttons.push(NostalgyCreateElem("label", { class:"text-link", value:"delete",
           onclick:"NostalgyRemoveRow(this.parentNode.parentNode);" }));
-
-  return NostalgyCreateElem("row",{ }, [
+  let html1=  NostalgyCreateElem("row",{ }, [
     NostalgyCreateElem("label", { value:txt }),
     NostalgyCreateElem("label", { id:"key_" + id, class:"text-link",
                           value:v,
                           onclick:"NostalgyWaitKey(this);",
                           onblur:"NostalgyCancel(this);" }),
     NostalgyCreateElem("hbox", { }, buttons)
-  ]);
+  ])    ;
+
+  return html1;
 }
 
 function NostalgyRemoveRow(r) {
   r.parentNode.removeChild(r);
 }
 
-function onNostalgyLoad() {
+function onNostalgyEditPrefsLoad() {
  document.addEventListener("dialogaccept", (event) => { onNostalgyAcceptChanges(); });
   NostalgyFolderSelectionBoxes();
- document.addEventListener("dialogextra2", (event) => { openDialog('chrome://nostalgy/content/about.xul', 'about_nostalgy', 'resizable'); });
+ document.addEventListener("dialogextra2", (event) => { const url = manage_emails.WL.messenger.runtime.getURL("popup/about_content.html");
+                                                        manage_emails.WL.messenger.windows.create({ url, type: "popup", height: 700, width: 780, });
+                                                        //openDialog('chrome://nostalgy/content/about.html', 'about_nostalgy', 'resizable=yes'); 
+                                                      });
 
   nostalgy_gList = NostalgyEBI("nrules");
   nostalgy_folder_select = NostalgyEBI("folderselect");
 
-  var prefs = NostalgyPrefBranch();
+  var prefs = PrefBranch();
   try {
    var r = NostalgyJSONEval(prefs.getCharPref("extensions.nostalgy.rules"));
    var i;
@@ -300,7 +358,14 @@ function onNostalgyLoad() {
  for (var n in nostalgy_completion_options)
    NostalgyEBI(n).checked = NostalgyGetBoolPref(prefs, n);
 
- NostalgyEBI("number_of_recent_folders").value = NostalgyGetIntPref(prefs, "number_of_recent_folders", 5);
+
+   NostalgyEBI("always_cc").checked = prefs.getBoolPref("extensions.manage_emails.showCC");
+   
+   NostalgyEBI("always_bcc").checked =  prefs.getBoolPref("extensions.manage_emails.showBCC");  
+
+
+
+   NostalgyEBI("number_of_recent_folders").value = NostalgyGetIntPref(prefs, "number_of_recent_folders", 5);
  NostalgyEBI("predict_max_addresses_to_update").value = NostalgyGetIntPref(prefs, "predict_max_addresses_to_update", 100);
 
  nostalgy_key_rows = NostalgyEBI("nostalgy_key_rows");
@@ -324,9 +389,27 @@ function onNostalgyLoad() {
      } catch (ex) { }
    }
  }
+ if (window.arguments) {  //coming from statusbar
+ if (window.arguments[0] =="new") setTimeout(NostalgyDoNewRule,300);  // NostalgyDoNewRule();  
+ //if (window.arguments[0] =="convert") setTimeout(NostalgyConvertToNewRule,300);  // NostalgyDoNewRule();  
+ if (window.arguments[0] =="convert") setTimeout(manage_emails.ConvertToNewRule,300);  // NostalgyDoNewRule();  
+}
 }
 
-function onNostalgyKeyPress(ev) {
+
+function onNostalgyEditPrefsKeyPress(ev) {
+  let inPrefWindow=true;
+  try {
+          let dummy=NostalgyEBI("number_of_recent_folders");
+          if (dummy==null)  inPrefWindow=false;
+  }
+
+  catch (e) {
+    inPrefWindow=false;
+  };
+
+
+  if (inPrefWindow) {
   // We don't want to act on Meta.  Necessary from thunderbird 18 on.
   if (ev.keyCode == KeyEvent.DOM_VK_META) return; 
 
@@ -346,6 +429,8 @@ function onNostalgyKeyPress(ev) {
        ("Do you really want to cancel all your changes to the preferences?"))
       NostalgyStopEvent(ev);
   }
+
+}
 }
 
 
@@ -395,17 +480,16 @@ function NostalgySelectFolder() {
 
 
 function NostalgyDoRestart() {
-
-//borrowed from restart-application-1.2.1 
-var boot=Components.classes['@mozilla.org/toolkit/app-startup;1'].getService(Components.interfaces.nsIAppStartup); 
-boot.quit(Components.interfaces.nsIAppStartup.eForceQuit|Components.interfaces.nsIAppStartup.eRestart);  let {BrowserUtils} = ChromeUtils.import ("resource://gre/modules/BrowserUtils.jsm", {});
-
+  Components.classes["@mozilla.org/xre/app-info;1"].
+  getService(Components.interfaces.nsIXULRuntime).invalidateCachesOnRestart();
+  Services.startup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eForceQuit);
 }
 
 
 
 
+//window.addEventListener("DOMContentLoaded", NostalgyDoNewRule, false);
 
 
-window.addEventListener("load", onNostalgyLoad, false);
-window.addEventListener("keypress", onNostalgyKeyPress, true);
+window.addEventListener("load", onNostalgyEditPrefsLoad, false);
+window.addEventListener("keypress", onNostalgyEditPrefsKeyPress, true);

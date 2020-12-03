@@ -1,4 +1,20 @@
-var nostalgy_completion_options = {
+/*
+ * License:  see License.txt
+ * Code until Nostalgy 0.3.0/Nostalgy 1.1.15: MIT/X11
+ * Code additions for TB 78 or later: Creative Commons (CC BY-ND 4.0):
+ *      Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0) 
+ 
+ * Contributors:  see Changes.txt
+ */
+
+
+var { manage_emails } = ChromeUtils.import("chrome://nostalgy/content/manage_emails.jsm");
+
+
+manage_emails.NostalgyFindFolderExact= NostalgyFindFolderExact;
+
+
+  var nostalgy_completion_options = {
   restrict_to_current_server : false,
   match_only_folder_name : false,
   match_only_prefix : false,
@@ -17,14 +33,14 @@ var nostalgy_recent_folders = [ ];
 var nostalgy_recent_folders_max_size = 5;
 
 function NostalgySaveRecentFolder(recent) {
-  NostalgyPrefBranch().
+  PrefBranch().
     setCharPref("extensions.nostalgy.recent_folders",
 		recent.toSource());
 }
 
 function NostalgyInstallRecentFolders() {
   var s = "";
-  try { s = NostalgyPrefBranch().
+  try { s = PrefBranch().
 	  getCharPref("extensions.nostalgy.recent_folders"); }
   catch (ex) { return; }
   var a = NostalgyJSONEval(s);
@@ -208,14 +224,13 @@ function NostalgyAutocompleteComponent() {
 }
 
 function NostalgyFolderSelectionBox(box) {
-
-   var cmd = box.getAttribute("nostalgyfolderbox");
+  var cmd = box.getAttribute("nostalgyfolderbox");
   if (cmd) {
-    box.setAttribute("ontextentered",cmd);
-    box.setAttribute("ontextcommand",cmd);
+  //  box.setAttribute("ontextentered",cmd);
+  //  box.setAttribute("ontextcommand",cmd);
     box.setAttribute("maxrows","15");
     box.setAttribute("crop","end");
-    box.setAttribute("flex","3");
+ //not in 78   box.setAttribute("flex","3");
     box.tabScrolling = false;
   }
 
@@ -237,7 +252,7 @@ function NostalgyFolderSelectionBox(box) {
 }
 
 function NostalgyFolderSelectionBoxes() {
- var e = document.getElementsByTagName("textbox");
+ var e = document.getElementsByTagName("html:input");
  for (var i = 0; i < e.length; i++)
   if (e[i].hasAttribute("nostalgyfolderbox"))
     NostalgyFolderSelectionBox(e[i]);
@@ -339,11 +354,7 @@ function NostalgyIterateFoldersAllServers(f) {
 
  for (i = 0; i < nservers; i++) {
      var server;
-     if (servers.GetElementAt) /* TB < 20 */
-         server = servers.GetElementAt(i).QueryInterface(Components.interfaces.nsIMsgIncomingServer);
-     else if (servers.queryElementAt) /* TB >= 20 */
-         server = servers.queryElementAt(i,Components.interfaces.nsIMsgIncomingServer);
-     else alert("NOSTALGY: cannot access server");
+     server=servers[i];
 
      var root = server.rootMsgFolder;
      var n = root.prettyName;
@@ -479,13 +490,13 @@ function NostalgyRecognizeKey(ev) {
  var comps = [];
  if(ev.altKey) comps.push("alt");
  if(ev.ctrlKey) comps.push("control");
- if(ev.metaKey) comps.push("meta");
- if(ev.shiftKey) comps.push("shift");
+ if(ev.metaKey ) comps.push("meta");
+ if(ev.shiftKey ) comps.push("shift");
 
  var k = "";
- if(ev.charCode == 32) k = "SPACE";
- else if(ev.charCode) k = String.fromCharCode(ev.charCode).toUpperCase();
- else k = nostalgy_gVKNames[ev.keyCode];
+ if(ev.key == " ") k = "SPACE";
+ else if(ev.key) k = (ev.key).toUpperCase();//String.fromCharCode(ev.charCode).toUpperCase();//TODO
+ //!!else k = nostalgy_gVKNames[ev.keyCode]; //TODO
 
  if (!k) return "";
  comps.push(k);
