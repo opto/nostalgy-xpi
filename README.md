@@ -12,7 +12,7 @@ use Thunderbird without sacrificing the productivity you had with good
 old mutt/pine, this extension is for you!
 
 Original code by Alain Frisch. Modified by opto (Klaus Buecher) for TB 68
-and now TB 78.
+and now TB 78and TB 91.
 
 Nostalgy adds keyboard shortcuts to change folder, move/copy messages,
 with folder name auto-completion (using only the keyboard).  Also
